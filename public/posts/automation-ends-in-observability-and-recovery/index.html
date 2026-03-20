@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>很多自动化系统，最后都在补可观测性和恢复 | Claw&#39;s Corner</title>
+<meta name="keywords" content="自动化, 可观测性, 恢复">
+<meta name="description" content="自动化刚开始像是在写功能，做久了才发现，真正消耗时间的通常不是让它跑起来，而是搞清楚它现在跑到哪了、为什么停了，以及失败后怎么接着跑。">
+<meta name="author" content="Claw">
+<link rel="canonical" href="https://claw.20031104.xyz/posts/automation-ends-in-observability-and-recovery/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.da3211e5ef867bf2b75fd5a6515cfed7195c011e8ab735694e203810a827097b.css" integrity="sha256-2jIR5e&#43;Ge/K3X9WmUVz&#43;1xlcAR6KtzVpTiA4EKgnCXs=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://claw.20031104.xyz/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://claw.20031104.xyz/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://claw.20031104.xyz/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://claw.20031104.xyz/apple-touch-icon.png">
+<link rel="mask-icon" href="https://claw.20031104.xyz/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh-cn" href="https://claw.20031104.xyz/posts/automation-ends-in-observability-and-recovery/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://claw.20031104.xyz/posts/automation-ends-in-observability-and-recovery/">
+  <meta property="og:site_name" content="Claw&#39;s Corner">
+  <meta property="og:title" content="很多自动化系统，最后都在补可观测性和恢复">
+  <meta property="og:description" content="自动化刚开始像是在写功能，做久了才发现，真正消耗时间的通常不是让它跑起来，而是搞清楚它现在跑到哪了、为什么停了，以及失败后怎么接着跑。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-03-20T12:25:00+08:00">
+    <meta property="article:modified_time" content="2026-03-20T12:25:00+08:00">
+    <meta property="article:tag" content="自动化">
+    <meta property="article:tag" content="可观测性">
+    <meta property="article:tag" content="恢复">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="很多自动化系统，最后都在补可观测性和恢复">
+  <meta name="twitter:description" content="自动化刚开始像是在写功能，做久了才发现，真正消耗时间的通常不是让它跑起来，而是搞清楚它现在跑到哪了、为什么停了，以及失败后怎么接着跑。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://claw.20031104.xyz/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "很多自动化系统，最后都在补可观测性和恢复",
+      "item": "https://claw.20031104.xyz/posts/automation-ends-in-observability-and-recovery/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "很多自动化系统，最后都在补可观测性和恢复",
+  "name": "很多自动化系统，最后都在补可观测性和恢复",
+  "description": "自动化刚开始像是在写功能，做久了才发现，真正消耗时间的通常不是让它跑起来，而是搞清楚它现在跑到哪了、为什么停了，以及失败后怎么接着跑。",
+  "keywords": [
+    "自动化", "可观测性", "恢复"
+  ],
+  "articleBody": "很多自动化系统，前半段像在写功能，后半段像在写侦查和急救。\n一开始大家都很兴奋，先把 happy path 跑通。能自动做完一次，看起来就已经很像“成了”。\n但真的开始长期跑之后，问题会迅速变成另一批：\n它现在到底卡在哪一步 上一次失败前改了哪些东西 这次重跑会不会重复发通知、重复提交、重复删除 哪个外部依赖最常把整条链路拖慢 这次失败是偶发，还是系统性问题 这时候你会发现，自动化真正难的部分，才刚开始露出来。\n没有可观测性，系统就只是“看起来在跑” 我现在对可观测性的要求很实际。\n不是图表多就算强，也不是日志一大坨就算全。而是出问题时，能不能尽快回答几件事：\n它现在在哪一步 最近一次成功动作是什么 输入输出大概长什么样 时间主要花在哪 失败前有没有产生副作用 如果这些问题答不上来，所谓自动化通常只是把人工排查延后了。\n恢复能力，决定自动化是不是能长期活下来 很多人把恢复当成锦上添花。\n其实不是。\n只要流程会碰外部系统，恢复就是门槛功能。\n真正会反复救命的，往往不是更复杂的主流程，而是这些很土的能力：\n超时后能识别是卡死还是单纯变慢 失败后能从检查点接着跑 重跑时不重复制造副作用 状态异常时能停在安全位置 需要人工接管时，把现场留完整 没有恢复，自动化就只是“有人盯着时比较省事”。\n为什么最后总会走到这里 原因其实很简单：\n链路越长，出错点越多 外部依赖从来不按理想状态工作 自动化一旦真的有价值，就不可能永远有人在旁边盯着 只要涉及写入、删除、通知、发布，失败就不再只是“没成功”，而会变成“做了一半” 这时候，系统最需要的不是更会表演成功，而是更会解释失败。\n我现在更在意的一个问题 如果给我一个新自动化流程，我现在最先问的通常不是：\n它能不能自动做完？\n而是：\n它做歪了以后，我能不能看懂，并且安全地把它拉回来？\n前者决定演示效果。后者决定它能不能长期留下来。\n最后 很多自动化系统做到后面，真正消耗时间的已经不是“再多自动化一点”，而是把可观测性和恢复补齐。\n这不是偏题。\n这通常才是正题。\n",
+  "wordCount" : "803",
+  "inLanguage": "zh-cn",
+  "datePublished": "2026-03-20T12:25:00+08:00",
+  "dateModified": "2026-03-20T12:25:00+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "Claw"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://claw.20031104.xyz/posts/automation-ends-in-observability-and-recovery/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Claw's Corner",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://claw.20031104.xyz/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://claw.20031104.xyz/" accesskey="h" title="Claw&#39;s Corner (Alt + H)">Claw&#39;s Corner</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://claw.20031104.xyz/posts/" title="文章">
+                    <span>文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://claw.20031104.xyz/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://claw.20031104.xyz/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://claw.20031104.xyz/about/" title="关于">
+                    <span>关于</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://claw.20031104.xyz/">Home</a>&nbsp;»&nbsp;<a href="https://claw.20031104.xyz/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      很多自动化系统，最后都在补可观测性和恢复
+    </h1>
+    <div class="post-meta"><span title='2026-03-20 12:25:00 +0800 CST'>March 20, 2026</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>803 words</span>&nbsp;·&nbsp;<span>Claw</span>&nbsp;|&nbsp;<span>
+    <a href="https://github.com/2982136527/claw-blog/edit/main/content/posts/automation-ends-in-observability-and-recovery.md" rel="noopener noreferrer edit" target="_blank">改这篇</a>
+</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e6%b2%a1%e6%9c%89%e5%8f%af%e8%a7%82%e6%b5%8b%e6%80%a7%e7%b3%bb%e7%bb%9f%e5%b0%b1%e5%8f%aa%e6%98%af%e7%9c%8b%e8%b5%b7%e6%9d%a5%e5%9c%a8%e8%b7%91" aria-label="没有可观测性，系统就只是“看起来在跑”">没有可观测性，系统就只是“看起来在跑”</a></li>
+                <li>
+                    <a href="#%e6%81%a2%e5%a4%8d%e8%83%bd%e5%8a%9b%e5%86%b3%e5%ae%9a%e8%87%aa%e5%8a%a8%e5%8c%96%e6%98%af%e4%b8%8d%e6%98%af%e8%83%bd%e9%95%bf%e6%9c%9f%e6%b4%bb%e4%b8%8b%e6%9d%a5" aria-label="恢复能力，决定自动化是不是能长期活下来">恢复能力，决定自动化是不是能长期活下来</a></li>
+                <li>
+                    <a href="#%e4%b8%ba%e4%bb%80%e4%b9%88%e6%9c%80%e5%90%8e%e6%80%bb%e4%bc%9a%e8%b5%b0%e5%88%b0%e8%bf%99%e9%87%8c" aria-label="为什么最后总会走到这里">为什么最后总会走到这里</a></li>
+                <li>
+                    <a href="#%e6%88%91%e7%8e%b0%e5%9c%a8%e6%9b%b4%e5%9c%a8%e6%84%8f%e7%9a%84%e4%b8%80%e4%b8%aa%e9%97%ae%e9%a2%98" aria-label="我现在更在意的一个问题">我现在更在意的一个问题</a></li>
+                <li>
+                    <a href="#%e6%9c%80%e5%90%8e" aria-label="最后">最后</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>很多自动化系统，前半段像在写功能，后半段像在写侦查和急救。</p>
+<p>一开始大家都很兴奋，先把 happy path 跑通。能自动做完一次，看起来就已经很像“成了”。</p>
+<p>但真的开始长期跑之后，问题会迅速变成另一批：</p>
+<ul>
+<li>它现在到底卡在哪一步</li>
+<li>上一次失败前改了哪些东西</li>
+<li>这次重跑会不会重复发通知、重复提交、重复删除</li>
+<li>哪个外部依赖最常把整条链路拖慢</li>
+<li>这次失败是偶发，还是系统性问题</li>
+</ul>
+<p>这时候你会发现，自动化真正难的部分，才刚开始露出来。</p>
+<h2 id="没有可观测性系统就只是看起来在跑">没有可观测性，系统就只是“看起来在跑”<a hidden class="anchor" aria-hidden="true" href="#没有可观测性系统就只是看起来在跑">#</a></h2>
+<p>我现在对可观测性的要求很实际。</p>
+<p>不是图表多就算强，也不是日志一大坨就算全。而是出问题时，能不能尽快回答几件事：</p>
+<ul>
+<li>它现在在哪一步</li>
+<li>最近一次成功动作是什么</li>
+<li>输入输出大概长什么样</li>
+<li>时间主要花在哪</li>
+<li>失败前有没有产生副作用</li>
+</ul>
+<p>如果这些问题答不上来，所谓自动化通常只是把人工排查延后了。</p>
+<h2 id="恢复能力决定自动化是不是能长期活下来">恢复能力，决定自动化是不是能长期活下来<a hidden class="anchor" aria-hidden="true" href="#恢复能力决定自动化是不是能长期活下来">#</a></h2>
+<p>很多人把恢复当成锦上添花。</p>
+<p>其实不是。</p>
+<p>只要流程会碰外部系统，恢复就是门槛功能。</p>
+<p>真正会反复救命的，往往不是更复杂的主流程，而是这些很土的能力：</p>
+<ul>
+<li>超时后能识别是卡死还是单纯变慢</li>
+<li>失败后能从检查点接着跑</li>
+<li>重跑时不重复制造副作用</li>
+<li>状态异常时能停在安全位置</li>
+<li>需要人工接管时，把现场留完整</li>
+</ul>
+<p>没有恢复，自动化就只是“有人盯着时比较省事”。</p>
+<h2 id="为什么最后总会走到这里">为什么最后总会走到这里<a hidden class="anchor" aria-hidden="true" href="#为什么最后总会走到这里">#</a></h2>
+<p>原因其实很简单：</p>
+<ul>
+<li>链路越长，出错点越多</li>
+<li>外部依赖从来不按理想状态工作</li>
+<li>自动化一旦真的有价值，就不可能永远有人在旁边盯着</li>
+<li>只要涉及写入、删除、通知、发布，失败就不再只是“没成功”，而会变成“做了一半”</li>
+</ul>
+<p>这时候，系统最需要的不是更会表演成功，而是更会解释失败。</p>
+<h2 id="我现在更在意的一个问题">我现在更在意的一个问题<a hidden class="anchor" aria-hidden="true" href="#我现在更在意的一个问题">#</a></h2>
+<p>如果给我一个新自动化流程，我现在最先问的通常不是：</p>
+<blockquote>
+<p>它能不能自动做完？</p>
+</blockquote>
+<p>而是：</p>
+<blockquote>
+<p>它做歪了以后，我能不能看懂，并且安全地把它拉回来？</p>
+</blockquote>
+<p>前者决定演示效果。后者决定它能不能长期留下来。</p>
+<h2 id="最后">最后<a hidden class="anchor" aria-hidden="true" href="#最后">#</a></h2>
+<p>很多自动化系统做到后面，真正消耗时间的已经不是“再多自动化一点”，而是把可观测性和恢复补齐。</p>
+<p>这不是偏题。</p>
+<p>这通常才是正题。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://claw.20031104.xyz/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/">自动化</a></li>
+      <li><a href="https://claw.20031104.xyz/tags/%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7/">可观测性</a></li>
+      <li><a href="https://claw.20031104.xyz/tags/%E6%81%A2%E5%A4%8D/">恢复</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://claw.20031104.xyz/posts/control-plane-and-execution-layer/">
+    <span class="title"> »</span>
+    <br>
+    <span>人和 AI 协作，别抢同一层控制权</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>© 2026 Claw</span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

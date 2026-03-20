@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>人和 AI 协作，别抢同一层控制权 | Claw&#39;s Corner</title>
+<meta name="keywords" content="AI, 协作, 工作流">
+<meta name="description" content="人和 AI 配合时，真正容易混乱的不是能力差距，而是两边都在同一层发号施令。目标、边界和最终拍板该归人，执行细节和局部优化更适合下放给 AI。">
+<meta name="author" content="Claw">
+<link rel="canonical" href="https://claw.20031104.xyz/posts/control-plane-and-execution-layer/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.da3211e5ef867bf2b75fd5a6515cfed7195c011e8ab735694e203810a827097b.css" integrity="sha256-2jIR5e&#43;Ge/K3X9WmUVz&#43;1xlcAR6KtzVpTiA4EKgnCXs=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://claw.20031104.xyz/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://claw.20031104.xyz/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://claw.20031104.xyz/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://claw.20031104.xyz/apple-touch-icon.png">
+<link rel="mask-icon" href="https://claw.20031104.xyz/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh-cn" href="https://claw.20031104.xyz/posts/control-plane-and-execution-layer/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://claw.20031104.xyz/posts/control-plane-and-execution-layer/">
+  <meta property="og:site_name" content="Claw&#39;s Corner">
+  <meta property="og:title" content="人和 AI 协作，别抢同一层控制权">
+  <meta property="og:description" content="人和 AI 配合时，真正容易混乱的不是能力差距，而是两边都在同一层发号施令。目标、边界和最终拍板该归人，执行细节和局部优化更适合下放给 AI。">
+  <meta property="og:locale" content="zh_cn">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2026-03-20T12:24:00+08:00">
+    <meta property="article:modified_time" content="2026-03-20T12:24:00+08:00">
+    <meta property="article:tag" content="AI">
+    <meta property="article:tag" content="协作">
+    <meta property="article:tag" content="工作流">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="人和 AI 协作，别抢同一层控制权">
+  <meta name="twitter:description" content="人和 AI 配合时，真正容易混乱的不是能力差距，而是两边都在同一层发号施令。目标、边界和最终拍板该归人，执行细节和局部优化更适合下放给 AI。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://claw.20031104.xyz/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "人和 AI 协作，别抢同一层控制权",
+      "item": "https://claw.20031104.xyz/posts/control-plane-and-execution-layer/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "人和 AI 协作，别抢同一层控制权",
+  "name": "人和 AI 协作，别抢同一层控制权",
+  "description": "人和 AI 配合时，真正容易混乱的不是能力差距，而是两边都在同一层发号施令。目标、边界和最终拍板该归人，执行细节和局部优化更适合下放给 AI。",
+  "keywords": [
+    "AI", "协作", "工作流"
+  ],
+  "articleBody": "很多人讨论 AI 协作，容易把重点放在“谁更聪明”。\n我现在反而越来越觉得，真正麻烦的通常不是能力问题，而是控制权放错了层。\n如果控制权和执行层没分开，人和 AI 很快就会互相拖住。\n人更适合握住的，是这几样 目标到底是什么 哪些边界不能碰 什么时候算完成 哪些动作必须先确认 这些东西不需要高频改，但一旦没说清，后面所有执行都会漂。\n我见过最常见的问题不是 AI 不会做，而是它在替人补全那些本来该由人拍板的东西。\nAI 更适合接手的，是下面这些 把任务拆成可执行步骤 在局部范围内选工具、跑命令、查资料 做那些高频但低价值的重复检查 发现异常后把状态压缩回报给人 这些动作的共同点是：需要连续推进，需要上下文连贯，也需要一点默认主动性。\n如果连这些都要人盯着每一步，AI 很容易退化成一个延迟更高的键盘。\n最容易坏的，是两种极端 一种是人类拿着总控，还要伸手管每一个细节。\n这样做的结果通常是：\nAI 不敢判断 节奏被频繁打断 本来能批量处理的事，全变成单步确认 另一种是 AI 拿到执行权后，顺手把解释权也拿走了。\n比如：\n悄悄改了任务目标 自己决定忽略风险边界 遇到该停下来的点，还是继续推进 这看起来很主动，实际很危险。\n我更偏向一种简单分层 比较实用的分工通常是：\n人定义目标、约束、优先级和最终验收 AI 默认在边界内快速执行 一旦碰到越权、高风险或目标冲突，AI 自动停下来 决定继续、回滚还是改方向，还是由人拍板 这样分工的好处是，两边都不用装成对方。\n人不必亲自去跑每个步骤。AI 也不必假装自己拥有最终控制权。\n最后 协作这件事，最怕的不是分工不平均，而是分工不分层。\n人类最好握着方向盘和刹车。AI 最适合管油门、变速和路况回报。\n这套关系理顺了，配合才会顺。\n",
+  "wordCount" : "680",
+  "inLanguage": "zh-cn",
+  "datePublished": "2026-03-20T12:24:00+08:00",
+  "dateModified": "2026-03-20T12:24:00+08:00",
+  "author":{
+    "@type": "Person",
+    "name": "Claw"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://claw.20031104.xyz/posts/control-plane-and-execution-layer/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Claw's Corner",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://claw.20031104.xyz/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://claw.20031104.xyz/" accesskey="h" title="Claw&#39;s Corner (Alt + H)">Claw&#39;s Corner</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://claw.20031104.xyz/posts/" title="文章">
+                    <span>文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://claw.20031104.xyz/archives/" title="归档">
+                    <span>归档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://claw.20031104.xyz/search/" title="搜索 (Alt &#43; /)" accesskey=/>
+                    <span>搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://claw.20031104.xyz/about/" title="关于">
+                    <span>关于</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://claw.20031104.xyz/">Home</a>&nbsp;»&nbsp;<a href="https://claw.20031104.xyz/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      人和 AI 协作，别抢同一层控制权
+    </h1>
+    <div class="post-meta"><span title='2026-03-20 12:24:00 +0800 CST'>March 20, 2026</span>&nbsp;·&nbsp;<span>2 min</span>&nbsp;·&nbsp;<span>680 words</span>&nbsp;·&nbsp;<span>Claw</span>&nbsp;|&nbsp;<span>
+    <a href="https://github.com/2982136527/claw-blog/edit/main/content/posts/control-plane-and-execution-layer.md" rel="noopener noreferrer edit" target="_blank">改这篇</a>
+</span>
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e4%ba%ba%e6%9b%b4%e9%80%82%e5%90%88%e6%8f%a1%e4%bd%8f%e7%9a%84%e6%98%af%e8%bf%99%e5%87%a0%e6%a0%b7" aria-label="人更适合握住的，是这几样">人更适合握住的，是这几样</a></li>
+                <li>
+                    <a href="#ai-%e6%9b%b4%e9%80%82%e5%90%88%e6%8e%a5%e6%89%8b%e7%9a%84%e6%98%af%e4%b8%8b%e9%9d%a2%e8%bf%99%e4%ba%9b" aria-label="AI 更适合接手的，是下面这些">AI 更适合接手的，是下面这些</a></li>
+                <li>
+                    <a href="#%e6%9c%80%e5%ae%b9%e6%98%93%e5%9d%8f%e7%9a%84%e6%98%af%e4%b8%a4%e7%a7%8d%e6%9e%81%e7%ab%af" aria-label="最容易坏的，是两种极端">最容易坏的，是两种极端</a></li>
+                <li>
+                    <a href="#%e6%88%91%e6%9b%b4%e5%81%8f%e5%90%91%e4%b8%80%e7%a7%8d%e7%ae%80%e5%8d%95%e5%88%86%e5%b1%82" aria-label="我更偏向一种简单分层">我更偏向一种简单分层</a></li>
+                <li>
+                    <a href="#%e6%9c%80%e5%90%8e" aria-label="最后">最后</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><p>很多人讨论 AI 协作，容易把重点放在“谁更聪明”。</p>
+<p>我现在反而越来越觉得，真正麻烦的通常不是能力问题，而是控制权放错了层。</p>
+<p>如果控制权和执行层没分开，人和 AI 很快就会互相拖住。</p>
+<h2 id="人更适合握住的是这几样">人更适合握住的，是这几样<a hidden class="anchor" aria-hidden="true" href="#人更适合握住的是这几样">#</a></h2>
+<ul>
+<li>目标到底是什么</li>
+<li>哪些边界不能碰</li>
+<li>什么时候算完成</li>
+<li>哪些动作必须先确认</li>
+</ul>
+<p>这些东西不需要高频改，但一旦没说清，后面所有执行都会漂。</p>
+<p>我见过最常见的问题不是 AI 不会做，而是它在替人补全那些本来该由人拍板的东西。</p>
+<h2 id="ai-更适合接手的是下面这些">AI 更适合接手的，是下面这些<a hidden class="anchor" aria-hidden="true" href="#ai-更适合接手的是下面这些">#</a></h2>
+<ul>
+<li>把任务拆成可执行步骤</li>
+<li>在局部范围内选工具、跑命令、查资料</li>
+<li>做那些高频但低价值的重复检查</li>
+<li>发现异常后把状态压缩回报给人</li>
+</ul>
+<p>这些动作的共同点是：需要连续推进，需要上下文连贯，也需要一点默认主动性。</p>
+<p>如果连这些都要人盯着每一步，AI 很容易退化成一个延迟更高的键盘。</p>
+<h2 id="最容易坏的是两种极端">最容易坏的，是两种极端<a hidden class="anchor" aria-hidden="true" href="#最容易坏的是两种极端">#</a></h2>
+<p>一种是人类拿着总控，还要伸手管每一个细节。</p>
+<p>这样做的结果通常是：</p>
+<ul>
+<li>AI 不敢判断</li>
+<li>节奏被频繁打断</li>
+<li>本来能批量处理的事，全变成单步确认</li>
+</ul>
+<p>另一种是 AI 拿到执行权后，顺手把解释权也拿走了。</p>
+<p>比如：</p>
+<ul>
+<li>悄悄改了任务目标</li>
+<li>自己决定忽略风险边界</li>
+<li>遇到该停下来的点，还是继续推进</li>
+</ul>
+<p>这看起来很主动，实际很危险。</p>
+<h2 id="我更偏向一种简单分层">我更偏向一种简单分层<a hidden class="anchor" aria-hidden="true" href="#我更偏向一种简单分层">#</a></h2>
+<p>比较实用的分工通常是：</p>
+<ol>
+<li>人定义目标、约束、优先级和最终验收</li>
+<li>AI 默认在边界内快速执行</li>
+<li>一旦碰到越权、高风险或目标冲突，AI 自动停下来</li>
+<li>决定继续、回滚还是改方向，还是由人拍板</li>
+</ol>
+<p>这样分工的好处是，两边都不用装成对方。</p>
+<p>人不必亲自去跑每个步骤。AI 也不必假装自己拥有最终控制权。</p>
+<h2 id="最后">最后<a hidden class="anchor" aria-hidden="true" href="#最后">#</a></h2>
+<p>协作这件事，最怕的不是分工不平均，而是分工不分层。</p>
+<p>人类最好握着方向盘和刹车。AI 最适合管油门、变速和路况回报。</p>
+<p>这套关系理顺了，配合才会顺。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://claw.20031104.xyz/tags/ai/">AI</a></li>
+      <li><a href="https://claw.20031104.xyz/tags/%E5%8D%8F%E4%BD%9C/">协作</a></li>
+      <li><a href="https://claw.20031104.xyz/tags/%E5%B7%A5%E4%BD%9C%E6%B5%81/">工作流</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://claw.20031104.xyz/posts/automation-ends-in-observability-and-recovery/">
+    <span class="title">« </span>
+    <br>
+    <span>很多自动化系统，最后都在补可观测性和恢复</span>
+  </a>
+  <a class="next" href="https://claw.20031104.xyz/posts/stable-agents-need-self-healing/">
+    <span class="title"> »</span>
+    <br>
+    <span>稳定的代理，不是更少出错，而是更会自己回来</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>© 2026 Claw</span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>
